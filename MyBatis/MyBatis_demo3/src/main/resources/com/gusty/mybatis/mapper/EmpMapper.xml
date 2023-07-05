@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gusty.mybatis.mapper.EmpMapper">
+
+    <!--
+        resultMap: 設置自訂義關係
+        id: 唯一標識，不能重複
+        type: 設置映射關係中的實體類類型
+        子標籤:
+        id: 設置主鍵的元素關係
+        result: 設置普通字段的映射關係
+        屬性:
+        property: 設置映射關係中的屬性名，必須是type屬性所設置的實體類類型中的屬性名
+        column: 設置映射關係中的的字段名，必須是sql語句查詢出的字段名
+    -->
+    <resultMap id="empResultMap" type="Emp">
+        <id property="eid" column="eid"></id>
+        <result property="empName" column="emp_name"></result>
+        <result property="age" column="age"></result>
+        <result property="sex" column="sex"></result>
+        <result property="email" column="email"></result>
+    </resultMap>
+
+    <!--List<Emp> getAllEmp();-->
+    <select id="getAllEmp" resultMap="empResultMap">
+        select * from t_emp
+    </select>
+
+    <!--處理多對一映射關係方式一: 級聯屬性賦值-->
+    <resultMap id="empAndDeptResultMapOne" type="Emp">
+        <id property="eid" column="eid"></id>
+        <result property="empName" column="emp_name"></result>
+        <result property="age" column="age"></result>
+        <result property="sex" column="sex"></result>
+        <result property="email" column="email"></result>
+        <result property="dept.did" column="did"></result>
+        <result property="dept.deptName" column="dept_name"></result>
+    </resultMap>
+    <!--處理多對一映射關係方式一: association  -->
+    <resultMap id="empAndDeptResultMapTwo" type="Emp">
+        <id property="eid" column="eid"></id>
+        <result property="empName" column="emp_name"></result>
+        <result property="age" column="age"></result>
+        <result property="sex" column="sex"></result>
+        <result property="email" column="email"></result>
+        <!--
+            association: 處理多對一的映射關係
+            property: 需要處理多對一的映射關係的屬性名
+            javaType: 該屬性的類型
+        -->
+        <association property="dept" javaType="Dept">
+            <id property="did" column="did"></id>
+            <result property="deptName" column="dept_name"></result>
+        </association>
+    </resultMap>
+    <!--Emp getEmpAndDept(@Param("eid") Integer eid);-->
+    <select id="getEmpAndDept" resultMap="empAndDeptResultMapTwo">
+        select * from t_emp left join t_dept on t_emp.did = t_dept.did where t_emp.eid = #{eid}
+    </select>
+
+    <resultMap id="empAndDeptByStepResultMap" type="Emp">
+        <id property="eid" column="eid"></id>
+        <result property="empName" column="emp_name"></result>
+        <result property="age" column="age"></result>
+        <result property="sex" column="sex"></result>
+        <result property="email" column="email"></result>
+        <!--
+            select: 設置分步查詢的sql的唯一標識(namespace.SQLId或mapper接口的全類名.方法名)
+            column: 設置分步查詢的條件
+            fetchType: 當開起了全局的延遲加載之後，可通過此屬性手動控制延遲加載的效果
+            fetchType="lazy|eager":lazy表示延遲加載，eager表示立即加載
+        -->
+        <association property="dept"
+                     select="com.gusty.mybatis.mapper.DeptMapper.getEmpAndDeptByStepTwo"
+                     column="did"
+                     fetchType="eager">
+        </association>
+    </resultMap>
+    <!--Emp getEmpAndDeptByStepOne(Integer eid);-->
+    <select id="getEmpAndDeptByStepOne" resultMap="empAndDeptByStepResultMap">
+        select * from t_emp where eid = #{eid}
+    </select>
+
+    <select id="getAllEmpOld" resultType="Emp">
+        <!--select eid,emp_name empName,age,sex,email from t_emp-->
+        select * from t_emp
+    </select>
+
+    <!--List<Emp> getDeptAndEmpByStepTwo(@Param("did") Integer did);-->
+    <select id="getDeptAndEmpByStepTwo" resultType="Emp">
+        select * from t_emp where did = #{did}
+    </select>
+
+</mapper>
