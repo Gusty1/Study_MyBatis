@@ -1,6 +1,6 @@
 # MyBatis簡介 
 
-## [課程網址](https://www.bilibili.com/video/BV1VP4y1c7j7/?p=1)
+## [課程影片](https://www.bilibili.com/video/BV1VP4y1c7j7/?p=1)
 
 ## MyBatis歷史
 - MyBatis最初是Apache的一個開源項目iBatis, 2010年6月這個項目由Apache Software Foundation遷移到了Google Code。隨著開發團隊轉投Google Code旗下，iBatis3.x正式更名為MyBatis。代碼於2013年11月遷移到Github
